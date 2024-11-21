@@ -92,7 +92,7 @@ apt-get update &>/dev/null
 apt-get install -y gpg libccid libfuse2 libpcsclite1 pcscd &>/dev/null
 publicKey="$(basename $PGP_PUBLIC_KEY_URL)"
 wget -qO "$publicKey" "$PGP_PUBLIC_KEY_URL"
-keyVal="$(gpg --show-keys $publicKey | grep -o -P '[A-Z0-9]{10,}')"
+keyVal="$(gpg --show-keys $publicKey &>/dev/null | grep -o -P '[A-Z0-9]{10,}')"
 debSig="$(basename $DEB_PACKAGE_SIGNATURE_URL)"
 debPkg="$(basename $DEB_PACKAGE_URL)"
 if [[ "$keyVal" == "$PGP_PUBLIC_KEY_FINGERPRINT" ]]; then
@@ -105,7 +105,7 @@ fi
 wget -qO "$debSig" "$DEB_PACKAGE_SIGNATURE_URL"
 wget -qO "$debPkg" "$DEB_PACKAGE_URL"
 if verify_signature "$debSig"; then
-  dpkg -i ./$debPkg
+  dpkg -i ./$debPkg &>/dev/null
 else
   echo "Signature verification failed. Terminating installation."
   exit
